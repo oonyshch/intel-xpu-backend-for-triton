@@ -460,17 +460,17 @@ def _reciprocal_involution_kernel(x_ptr, out_ptr, n_elements, BLOCK: gl.constexp
 
 @pytest.mark.parametrize("op", ["mul_one", "add_zero"])
 def test_constant_identity_noop(device, op, fresh_knobs):
-    _require_cuda_backend(device)
+    _require_backend(device)
 
     fresh_knobs.compilation.instrumentation_mode = "fpsan"
 
     n_elements = 1024
     BLOCK = 256
 
-    g = torch.Generator(device="cuda")
+    g = torch.Generator(device=device)
     g.manual_seed(2)
-    x = torch.randint(-(2**31), 2**31 - 1, (n_elements, ), dtype=torch.int32, device="cuda", generator=g)
-    out = torch.empty((n_elements, ), dtype=torch.int32, device="cuda")
+    x = torch.randint(-(2**31), 2**31 - 1, (n_elements, ), dtype=torch.int32, device=device, generator=g)
+    out = torch.empty((n_elements, ), dtype=torch.int32, device=device)
 
     grid = (triton.cdiv(n_elements, BLOCK), )
     _constant_identity_kernel[grid](
@@ -486,17 +486,17 @@ def test_constant_identity_noop(device, op, fresh_knobs):
 
 
 def test_reciprocal_involution(device, fresh_knobs):
-    _require_cuda_backend(device)
+    _require_backend(device)
 
     fresh_knobs.compilation.instrumentation_mode = "fpsan"
 
     n_elements = 1024
     BLOCK = 256
 
-    g = torch.Generator(device="cuda")
+    g = torch.Generator(device=device)
     g.manual_seed(3)
-    x = torch.randint(-(2**31), 2**31 - 1, (n_elements, ), dtype=torch.int32, device="cuda", generator=g)
-    out = torch.empty((n_elements, ), dtype=torch.int32, device="cuda")
+    x = torch.randint(-(2**31), 2**31 - 1, (n_elements, ), dtype=torch.int32, device=device, generator=g)
+    out = torch.empty((n_elements, ), dtype=torch.int32, device=device)
 
     grid = (triton.cdiv(n_elements, BLOCK), )
     _reciprocal_involution_kernel[grid](
@@ -760,18 +760,18 @@ def test_exp_exp2_scaled_identity(device, fresh_knobs):
 
 
 def test_exp_neg_reciprocal_identity(device, fresh_knobs):
-    _require_cuda_backend(device)
+    _require_backend(device)
 
     fresh_knobs.compilation.instrumentation_mode = "fpsan"
 
     n_elements = 1024
     BLOCK = 256
 
-    g = torch.Generator(device="cuda")
+    g = torch.Generator(device=device)
     g.manual_seed(4)
-    x = torch.randint(-(2**31), 2**31 - 1, (n_elements, ), dtype=torch.int32, device="cuda", generator=g)
-    out_neg = torch.empty((n_elements, ), dtype=torch.int32, device="cuda")
-    out_recip = torch.empty((n_elements, ), dtype=torch.int32, device="cuda")
+    x = torch.randint(-(2**31), 2**31 - 1, (n_elements, ), dtype=torch.int32, device=device, generator=g)
+    out_neg = torch.empty((n_elements, ), dtype=torch.int32, device=device)
+    out_recip = torch.empty((n_elements, ), dtype=torch.int32, device=device)
 
     xw = triton.TensorWrapper(x, dtype=torch.float32)
     out_neg_w = triton.TensorWrapper(out_neg, dtype=torch.float32)
